@@ -9,7 +9,7 @@ from constants import *
 
 
 class Commander:
-    def __init__(self, port="COM7", numServos=8):
+    def __init__(self, port="COM4", numServos=8):
         #self.ser = serial.Serial(port, 38400)
         port = None
         if os.name == "posix":
@@ -20,7 +20,9 @@ class Commander:
             if port is None:
                 raise Exception('Could not find any of %s' % repr(possibilities))
         else:
-            portName = "COM9"
+            portName = "COM4"
+        port = "COM4"
+        print "PORT: ", port
         self.ser = serial.Serial(port, 38400)
         
         self.numServos = numServos
@@ -56,13 +58,14 @@ class Commander:
         reply = ''
         self.failedPackets = -1
         while reply != HELLO:
+            print "reply/hello:" + reply + ":" + HELLO
             self.failedPackets += 1
             print "about to write hello"
             self.__writeCommand(HELLO)
             print "wrote command"
-            reply = self.ser.readline()
+            reply = self.ser.readline().strip()
             print "helloReply: " + reply
-        print self.failedPackets
+        print "failed packets: " + repr(self.failedPackets)
     
     def query(self):
         '''Requests information regarding servo positions from ArbotiX. Returns
@@ -74,10 +77,10 @@ class Commander:
             raise Exception("did not receive QUERY")
         
         reply = [int(pos) for pos in reply[2:-2].split(SEPARATOR)]
-        if len(reply) != self.numServos:
-            raise Exception("invalid reply--expected " + str(self.numServos) + " items but got " + str(len(reply)))
-        
-        return [int(pos) for pos in reply[2:-2].split(SEPARATOR)]
+        #if len(reply) != self.numServos:
+        #    raise Exception("invalid reply--expected " + str(self.numServos) + " items but got " + str(len(reply)))
+        return reply
+        #return [int(pos) for pos in reply[2:-2].split(SEPARATOR)]
     
     def commandPos(self, posVector):
         '''Commands ArbotiX to move servos to the given goal position.'''
@@ -211,7 +214,7 @@ def randomInterp():
     
     steps = vectorizeFunctions(servos)
     
-    robot = Commander(port="COM6")
+    robot = Commander(port="COM4")
     #robot.helloBoard()
     robot.executeSteps(steps)
 
@@ -226,6 +229,10 @@ def sinWaveMotion():
     f2   = lambda t : int(r * (sin(t) + cos(t)) + r)
     f = lambda t: (sinF(t), sinF(t), sinF(t), sinF(t), f2(t), f1(t), cosF(t), sinF(t))
     #f= lambda t: (sinF(t), sinF(t), sinF(t), sinF(t), sinF(t), sinF(t), sinF(t), sinF(t))
+    robot.helloBoard()
+    print "past hello"
+    robot.query()
+    print "past query"
     robot.executeMotionFunction(motionFunction=f, domain=(0,20))
     
 def randomMotion():
@@ -245,19 +252,19 @@ def randomMotion():
     mf = lambda t: (int(fVec[0](t)),int(fVec[1](t)),int(fVec[2](t)),int(fVec[3](t)),
                     int(fVec[4](t)),int(fVec[5](t)),int(fVec[6](t)),int(fVec[7](t)))
     
-    robot = Commander(port="COM6")
+    robot = Commander(port="COM4")
     #robot.helloBoard()
     print "past hello"
     robot.executeMotionFunction(motionFunction=mf,domain=(startTime,endTime))
     
     
 if __name__ == '__main__':
-    #robot = Commander("COM6")
+    #robot = Commander("COM4")
     #robot.commandPos([512]*8)
     #randomInterp()
     sinWaveMotion()
-#    while True:
-#        sinWaveMotion()
+    #while True:
+    #    sinWaveMotion()
     
         
     

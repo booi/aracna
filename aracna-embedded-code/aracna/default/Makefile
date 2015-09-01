@@ -1,5 +1,5 @@
 ################################################################################
-# Automatically-generated file. Do not edit!
+# Automatically-generated file. Do not edit!  No, edited by james
 ################################################################################
 
 SHELL := cmd.exe
@@ -125,12 +125,11 @@ $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP)
 	"C:\WinAVR-20100110\bin\avr-size.exe" "aracna.elf"
 	
 
-
-
-
-
 # Other Targets
 clean:
 	-$(RM) $(OBJS_AS_ARGS)$(C_DEPS_AS_ARGS) $(EXECUTABLES) 
 	rm -rf "aracna.elf" "aracna.a" "aracna.hex" "aracna.lss" "aracna.eep" "aracna.map"
-	
+
+# Load target to COM4.  Requires Arduino's avrdude files
+upload:
+	"C:\Program Files (x86)\Arduino\hardware\tools\avr\bin\avrdude.exe" -C"C:\Program Files (x86)\Arduino\hardware\tools\avr\etc\avrdude.conf" -p atmega644p -v -v -v -c arduino -P\\.\COM4 -b 38400 -D -Uflash:w:"aracna.hex":i
